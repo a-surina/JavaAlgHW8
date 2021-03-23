@@ -2,11 +2,20 @@ public class HashTable {
     private Flat[] hashArr;
     private int arrSize;
     private final Flat nonFlat;
+    private boolean useDoubleHashing;
 
     public HashTable(int size) {
         this.arrSize = size;
         this.hashArr = new Flat[arrSize];
         this.nonFlat = new Flat(-1, "");
+        this.useDoubleHashing = false;
+    }
+
+    public HashTable(int size, boolean useDoubleHashing) {
+        this.arrSize = size;
+        this.hashArr = new Flat[arrSize];
+        this.nonFlat = new Flat(-1, "");
+        this.useDoubleHashing = useDoubleHashing;
     }
 
     public void onlyFlatsPrinter() {
@@ -33,16 +42,21 @@ public class HashTable {
         return key % this.arrSize;
     }
 
+    private int secondaryHashFunc(int key) {
+        return 15 - key % 5;
+    }
+
     public boolean insert(Flat flat) {
         int key = flat.getKey();
         int hashVal = hashFunc(key);
+        int stepSize = secondaryHashFunc(key);
         int j = 0;
         while (j < this.arrSize) {
             if (this.hashArr[hashVal] == null) {
                 this.hashArr[hashVal] = flat;
                 return true;
             } else {
-                ++hashVal;
+                hashVal = useDoubleHashing ? hashVal+stepSize : ++hashVal+1;
                 hashVal %= this.arrSize;
                 j++;
             }
@@ -53,6 +67,7 @@ public class HashTable {
 
     public boolean delete(int key) {
         int hashVal = hashFunc(key);
+        int stepSize = secondaryHashFunc(key);
         int j = 0;
         while (j < this.arrSize) {
             if (this.hashArr[hashVal] != null &&
@@ -61,7 +76,7 @@ public class HashTable {
                 this.hashArr[hashVal] = nonFlat;
                 return true;
             } else {
-                ++hashVal;
+                hashVal = useDoubleHashing ? hashVal+stepSize : ++hashVal+1;
                 hashVal %= this.arrSize;
                 j++;
             }
@@ -71,6 +86,7 @@ public class HashTable {
 
     public Flat find(int key) {
         int hashVal = hashFunc(key);
+        int stepSize = secondaryHashFunc(key);
         int j = 0;
         while (j < this.arrSize) {
             if (this.hashArr[hashVal] != null &&
@@ -78,7 +94,7 @@ public class HashTable {
                     this.hashArr[hashVal].getKey() == key) {
                 return this.hashArr[hashVal];
             } else {
-                ++hashVal;
+                hashVal = useDoubleHashing ? hashVal+stepSize : ++hashVal+1;
                 hashVal %= this.arrSize;
                 j++;
             }

@@ -45,40 +45,85 @@ public class Main {
         Flat aFlat;
         int aKey;
         String anOwner;
-        int size = 67;
+        int size = 37;
 
         HashTable hTable = new HashTable(size);
+        System.out.println("Hash table with single hashing created: \n");
 
         Random rand = new Random();
         Faker faker = new Faker(new Locale("fi", "FI"));
 
-        for (int i = 0; i < 65; i++) {
+        System.out.println("Some values have been inserted into the table:");
+        System.out.println("190: " + hTable.insert(new Flat(190, "Torvalds Linus"))); //hash = 5
+        System.out.println("338: " + hTable.insert(new Flat(338, "Haapasalo Ville")) + "\n"); //hash = 5, но добавится на другое место
+        hTable.fullPrinter();
+        System.out.println();
+
+        for (int i = 0; i < 35; i++) {
             aKey = rand.nextInt(999);
             anOwner = faker.name().lastName() + " " + faker.name().firstName();
             aFlat = new Flat(aKey, anOwner);
             hTable.insert(aFlat);
         }
 
-        System.out.println("Some values have been inserted into the table:");
-        System.out.println("203: " + hTable.insert(new Flat(203, "Torvalds Linus"))); //hash = 5
-        System.out.println("467: " + hTable.insert(new Flat(467, "Haapasalo Ville"))); //hash = 5, но добавится на другое место
+        System.out.println("The table is full:");
         hTable.fullPrinter();
         System.out.println();
 
         System.out.println("Some values have been been deleted from the table:");
-        System.out.println("467: " + hTable.delete(467)); //true
-        System.out.println("467: " + hTable.delete(467)); //false
-        System.out.println("3: " + hTable.delete(1003) + "\n"); //false
-        System.out.println("The table is full - rehashing is performed:");
+        System.out.println("338: " + hTable.delete(338)); //true
+        System.out.println("338: " + hTable.delete(338)); //false
+        System.out.println("1003: " + hTable.delete(1003) + "\n"); //false
+        hTable.onlyFlatsPrinter();
+        System.out.println();
+
+        System.out.println("The table size is not enough - rehashing is performed:");
         System.out.println("999: " + hTable.insert(new Flat(999, "Kaurismäki Aki")) + "\n"); //не добавится, т.к. список переполнен
         hTable.onlyFlatsPrinter();
         System.out.println();
 
         System.out.println("Let's find some flats:");
-        System.out.println(hTable.find(203).printer());
+        System.out.println(hTable.find(190).printer());
         System.out.println(hTable.find(1003).printer() + "\n"); //doesn't exist
 
         //Задание 8.6: алгоритм двойного хеширования
 
+        HashTable doubleHTable = new HashTable(size, true);
+        System.out.println("Hash table with double hashing created: \n");
+
+        System.out.println("Some values have been inserted into the table:");
+        System.out.println("190: " + doubleHTable.insert(new Flat(190, "Smetana Вedřich"))); //hash = 5
+        System.out.println("338: " + doubleHTable.insert(new Flat(338, "Kundera Milan")) + "\n"); //hash = 5, но добавится на другое место
+        doubleHTable.fullPrinter();
+        System.out.println();
+
+        Faker fakerCz = new Faker(new Locale("cz", "Cz"));
+
+        for (int i = 0; i < 35; i++) {
+            aKey = rand.nextInt(999);
+            anOwner = fakerCz.name().lastName() + " " + fakerCz.name().firstName();
+            aFlat = new Flat(aKey, anOwner);
+            doubleHTable.insert(aFlat);
+        }
+
+        System.out.println("The table is full:");
+        doubleHTable.fullPrinter();
+        System.out.println();
+
+        System.out.println("Some values have been been deleted from the table:");
+        System.out.println("338: " + doubleHTable.delete(338)); //true
+        System.out.println("338: " + doubleHTable.delete(338)); //false
+        System.out.println("1003: " + doubleHTable.delete(1003) + "\n"); //false
+        doubleHTable.onlyFlatsPrinter();
+        System.out.println();
+
+        System.out.println("The table size is not enough - rehashing is performed:");
+        System.out.println("999: " + doubleHTable.insert(new Flat(999, "Škoda Emil")) + "\n"); //не добавится, т.к. список переполнен
+        doubleHTable.onlyFlatsPrinter();
+        System.out.println();
+
+        System.out.println("Let's find some flats:");
+        System.out.println(doubleHTable.find(190).printer());
+        System.out.println(doubleHTable.find(1003).printer() + "\n"); //doesn't exist
     }
 }
